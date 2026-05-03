@@ -1,0 +1,26 @@
+import axios from "axios";
+
+export const dynamic = "force-dynamic";
+
+async function getProduct(id: string) {
+    console.log("🔥 FRONTEND ID:", id);
+  try {
+    const res = await axios.get(`http://localhost:4000/product/${id}`);
+    return res.data;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+export default async function ProductPage({ params }: { params: { id: string } }) {
+  const product = await getProduct(params.id);
+
+  if (!product) return <p>Product not found</p>;
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold">{product.name}</h1>
+    </div>
+  );
+}
