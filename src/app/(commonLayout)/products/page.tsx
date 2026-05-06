@@ -2,6 +2,7 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 
+
 type Product = {
   id: string;
   name: string;
@@ -20,6 +21,7 @@ async function getProducts(): Promise<Product[]> {
     return [];
   }
 }
+
 
 export default async function ProductsPage() {
     console.log("LIST PAGE RENDERED");

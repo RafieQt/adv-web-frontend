@@ -12,7 +12,7 @@ const registerSchema = z.object({
   username: z.string().trim().min(3, "Username must be at least 3 characters"),
   fullname: z.string().trim().min(3, "Full name must be at least 3 characters"),
   email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().trim().min(6, "Password must be at least 6 characters"),
 });
 
 type RegisterData = z.infer<typeof registerSchema>;
