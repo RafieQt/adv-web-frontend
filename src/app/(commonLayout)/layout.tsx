@@ -1,14 +1,14 @@
-import { Navbar } from "@/components/layout/navbar";
+import Navbar from "@/components/layout/navbar";
 
 export default function CommonLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <div>
-            <Navbar />
-            {children}
-        </div>
-    );
+  return (
+    <div>
+      <Navbar />
+      {children}
+    </div>
+  );
 }

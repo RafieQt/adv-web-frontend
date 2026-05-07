@@ -1,187 +1,138 @@
 "use client";
-
+import axios from "axios";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import {
-  Accordion,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
-import { ModeToggle } from "./mode-toggle";
+type User = {
+  id: string;
+  email: string;
+  username: string;
+  fullname: string;
+};
 
-interface MenuItem {
-  title: string;
-  url: string;
-  description?: string;
-  icon?: React.ReactNode;
-  items?: MenuItem[];
-}
+export default function Navbar() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-interface NavbarProps {
-  className?: string;
-  logo?: {
-    url: string;
-    src: string;
-    alt: string;
-    title: string;
-    className?: string;
-  };
-  menu?: MenuItem[];
-  auth?: {
-    login: {
-      title: string;
-      url: string;
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/auth/me", {
+          withCredentials: true,
+        });
+
+        setUser(res.data);
+        console.log(res.data);
+        setLoading(false);
+      } catch (err) {
+        router.push("/login");
+      }
     };
-    signup: {
-      title: string;
-      url: string;
-    };
-  };
-}
 
-const Navbar = ({
-  logo = {
-    url: "/",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg",
-    alt: "logo",
-    title: "E-commerce Management Web",
-  },
-  menu = [
-    { title: "Home", url: "/" },
-    { title: "Products", url: "/products" },
-    { title: "About", url: "/about" },
-    { title: "Contact", url: "/contact" },
-    { title: "Dashboard", url: "/dashboard" },
-  ],
-  auth = {
-    login: { title: "Login", url: "/login" },
-    signup: { title: "Sign up", url: "/signup" },
-  },
-  className,
-}: NavbarProps) => {
+    fetchUser();
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:4000/auth/logout",
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      router.push("/login");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
-    <section className={cn("py-0", className)}>
-      <div className="container dark:bg-slate-950 mx-auto px-6 py-3 border-b-1 border-gray-200 dark:border-gray-700">
-        {/* Desktop Menu */}
-        <nav className="hidden items-center justify-between lg:flex">
-          <div className="flex items-center gap-6">
-            <Link href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
+    <div className="max-lg:collapse bg-base-200 lg:mb-48 shadow-sm w-full rounded-md">
+      <input id="navbar-1-toggle" className="peer hidden" type="checkbox" />
+      <label
+        htmlFor="navbar-1-toggle"
+        className="fixed inset-0 hidden max-lg:peer-checked:block"
+      ></label>
+      <div className="collapse-title navbar">
+        <div className="navbar-start">
+          <label htmlFor="navbar-1-toggle" className="btn btn-ghost lg:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h8m-8 6h16"
               />
-              <span className="text-lg font-semibold tracking-tighter">
-                {logo.title}
-              </span>
-            </Link>
-            <div className="flex items-center">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
-                </NavigationMenuList>
-              </NavigationMenu>
+            </svg>
+          </label>
+          <button className="btn btn-ghost text-xl">SmartMart</button>
+        </div>
+        <div className="navbar-center hidden lg:flex">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <Link href="/">Home</Link>
+            </li>
+            <li>
+              <Link href="/products">Products</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contact Us</Link>
+            </li>
+            <li>
+              <Link href="/dashboard">Dashboard</Link>
+            </li>
+          </ul>
+        </div>
+        <div className="navbar-end">
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="bg-[#111827] text-white px-4 py-2 rounded hover:bg-[#1F2937]"
+            >
+              Logout
+            </button>
+          ) : (
+            <div>
+              <Link
+                href="/login"
+                className="btn bg-red-500 hover:bg-red-700 text-white rounded-md"
+              >
+                Signin
+              </Link>
+              <Link href="signup" className="btn rounded-md ml-2">
+                Register
+              </Link>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <ModeToggle />
-            <Button asChild variant="outline" size="sm">
-              <Link href={auth.login.url}>{auth.login.title}</Link>
-            </Button>
-            <Button asChild className="!bg-red-500 hover:!bg-red-700 text-white" size="sm">
-              <Link href={auth.signup.url}>{auth.signup.title}</Link>
-            </Button>
-          </div>
-        </nav>
-
-        {/* Mobile Menu */}
-        <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
-            <Link href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              />
-            </Link>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>
-                    <Link href={logo.url} className="flex items-center gap-2">
-                      <img
-                        src={logo.src}
-                        className="max-h-8 dark:invert"
-                        alt={logo.alt}
-                      />
-                    </Link>
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-6 p-4">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex w-full flex-col gap-4"
-                  >
-                    {menu.map((item) => renderMobileMenuItem(item))}
-                  </Accordion>
-                  <div className="flex flex-col gap-3">
-                    <ModeToggle />
-                    <Button asChild variant="outline">
-                      <Link href={auth.login.url}>{auth.login.title}</Link>
-                    </Button>
-                    <Button asChild className="!bg-red-500 hover:!bg-red-700 text-white">
-                      <Link href={auth.signup.url}>{auth.signup.title}</Link>
-                    </Button>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          )}
         </div>
       </div>
-    </section>
-  );
-};
 
-const renderMenuItem = (item: MenuItem) => {
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink asChild
-        className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 
-        text-sm font-medium transition-colors hover:bg-muted dark:hover:bg-slate-800 hover:text-accent-foreground"
-      >
-        <Link href={item.url}>{item.title}</Link>
-      </NavigationMenuLink>
-    </NavigationMenuItem>
+      <div className="collapse-content lg:hidden z-1">
+        <ul className="menu">
+          <li>
+            <Link href="/">Home</Link>
+          </li>
+          <li>
+            <Link href="/products">Products</Link>
+          </li>
+          <li>
+            <Link href="/contact">Contact Us</Link>
+          </li>
+          <li>
+            <Link href="/dashboard">Dashboard</Link>
+          </li>
+        </ul>
+      </div>
+    </div>
   );
-};
-
-const renderMobileMenuItem = (item: MenuItem) => {
-  return (
-    <Link key={item.title} href={item.url} className="text-md font-semibold">
-      {item.title}
-    </Link>
-  );
-};
-
-export { Navbar };
+}
