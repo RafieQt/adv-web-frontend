@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 type Product = {
   description: string;
@@ -58,8 +59,32 @@ export default function BuyButton({
       customerId: user?.id,
       status: "unpaid",
     };
-    const res = await axios.post("http://localhost:4000/order/create", info, {
-      withCredentials: true,
+
+    Swal.fire({
+      title: "Purchase The Product?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Add to the Cart!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await axios.post(
+          "http://localhost:4000/order/create",
+          info,
+          {
+            withCredentials: true,
+          },
+        );
+        console.log(res);
+        Swal.fire({
+        title: "Added to Cart!",
+        text: "The Product Has Been Successfully Added to Your Cart.",
+        icon: "success",
+      });
+      }
+      
     });
   };
 
