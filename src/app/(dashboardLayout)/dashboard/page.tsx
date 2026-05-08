@@ -13,11 +13,19 @@ type User = {
   username: string;
   fullname: string;
 };
+type Order = {
+  id: string;
+  productName: string;
+  totalAmount: number;
+  status: string;
+  orderDate: string;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,6 +36,14 @@ export default function DashboardPage() {
 
         setUser(res.data);
         console.log(res.data);
+        const res1 = await axios.get(
+          `http://localhost:4000/order/customer/${res.data.id}`,
+          {
+            withCredentials: true,
+          },
+        );
+        console.log(res1);
+        setOrders(res1.data);
         setLoading(false);
       } catch (err) {
         router.push("/login");
@@ -38,22 +54,6 @@ export default function DashboardPage() {
   }, [router]);
 
   if (loading) return <p>Loading...</p>;
-
-  const handleLogout = async () => {
-    try {
-      await axios.post(
-        "http://localhost:4000/auth/logout",
-        {},
-        {
-          withCredentials: true,
-        },
-      );
-
-      router.push("/login");
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const handleDeleteAccount = async () => {
     Swal.fire({
@@ -73,7 +73,7 @@ export default function DashboardPage() {
               withCredentials: true,
             },
           );
-          if(res.status === 200){
+          if (res.status === 200) {
             Swal.fire("Deleted!", "Your account has been deleted.", "success");
             router.push("/login");
           }
@@ -83,26 +83,12 @@ export default function DashboardPage() {
       }
     });
   };
-
+  console.log(orders);
+  
   return (
     <div>
       <Navbar></Navbar>
       <div className="flex-1 flex flex-col">
-        {/* Topbar */}
-        <header className="flex justify-between items-center bg-white shadow px-6 py-4">
-          <h1 className="text-xl font-semibold text-[#1F2937]">
-            Welcome, {user?.fullname}
-          </h1>
-
-          <button
-            onClick={handleLogout}
-            className="bg-[#111827] text-white px-4 py-2 rounded hover:bg-[#1F2937]"
-          >
-            Logout
-          </button>
-        </header>
-
-        {/* Content Area */}
         <main className="p-6">
           <div className="bg-white p-6 rounded-2xl shadow  w-90">
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">User Info</h2>
@@ -129,6 +115,38 @@ export default function DashboardPage() {
               >
                 Delete Account
               </button>
+            </div>
+          </div>
+          <div>
+            <div>
+              <h1 className="text-3xl text-[#111827] font-semibold my-3">Cart:</h1>
+              <div className="overflow-x-auto">
+                <table className="table">
+                  {/* head */}
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Product Name</th>
+                      <th>Total Amount</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* row 1 */}
+
+                    {orders.map((order, index) => (
+                      <tr key={order.id}>
+                        <th>{index+1}</th>
+                        <td>{order.productName}</td>
+                        <td>{order.totalAmount}</td>
+                        <td>{order.status}</td>
+                        <td>{order.orderDate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </main>
