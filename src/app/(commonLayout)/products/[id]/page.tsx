@@ -15,15 +15,6 @@ async function getProduct(id: string) {
   }
 }
 
-const handleBuy = (product)=>{
-  const productInfo = {
-    productName: product.name,
-    totalAmount: 1,
-    customerId: "asfa",
-    status: "unpaid"
-  }
-}
-
 export default async function ProductPage({
   params,
 }: {
