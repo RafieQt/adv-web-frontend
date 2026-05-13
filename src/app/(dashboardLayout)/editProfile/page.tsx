@@ -81,7 +81,6 @@ export default function EditProfile() {
 
   return (
     <div>
-      <Navbar></Navbar>
       <div className="w-90 bg-white shadow-2xl rounded-2xl mx-auto p-4 mt-10">
       <h1 className="text-2xl font-bold text-[#1F2937] mb-4">Edit Profile</h1>
       <form onSubmit={handleEdit} className="flex flex-col">
@@ -115,7 +114,7 @@ export default function EditProfile() {
           type="submit"
           className="bg-[#111827] text-white font-semibold text-center w-40 mt-3 rounded-xl py-1 mx-auto"
         >
-          Register
+          Edit profile
         </button>
       </form>
     </div>

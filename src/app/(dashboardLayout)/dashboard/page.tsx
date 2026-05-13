@@ -87,7 +87,6 @@ export default function DashboardPage() {
   
   return (
     <div>
-      <Navbar></Navbar>
       <div className="flex-1 flex flex-col">
         <main className="p-6">
           <div className="bg-white p-6 rounded-2xl shadow  w-90">
