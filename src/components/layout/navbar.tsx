@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type User = {
@@ -11,7 +11,10 @@ type User = {
   fullname: string;
 };
 
+
 export default function Navbar() {
+  const pathname = usePathname();
+
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +35,7 @@ export default function Navbar() {
     };
 
     fetchUser();
-  }, [router]);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
